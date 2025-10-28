@@ -1,3 +1,3 @@
-# hostel-accommodation-using-mysql
+# hostel-accommodation-using-c++-mysql
 
  

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - Hostel Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> My Dashboard</h2>
+    {% if not bed_info %}
+    <a href="{{ url_for('apply_for_bed') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Apply for Bed
+    </a>
+    {% endif %}
+</div>
+
+<!-- Bed Allocation Status -->
+{% if bed_info %}
+<div class="card shadow mb-4 border-success">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-check-circle"></i> Bed Allocated</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4><span class="badge bg-primary fs-4">{{ bed_info.BedNo }}</span></h4>
+                <p class="mb-1"><strong>Name:</strong> {{ bed_info.Name }}</p>
+                {% if bed_info.StudentID %}
+                <p class="mb-1"><strong>Student ID:</strong> {{ bed_info.StudentID }}</p>
+                {% endif %}
+                {% if bed_info.Contact %}
+                <p class="mb-1"><strong>Contact:</strong> {{ bed_info.Contact }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Check-in Date:</strong> 
+                    {{ bed_info.CheckInDate.strftime('%Y-%m-%d') if bed_info.CheckInDate else 'N/A' }}
+                </p>
+                <p class="mb-1">
+                    <strong>Payment Status:</strong>
+                    {% if bed_info.PaymentStatus == 'Paid' %}
+                        <span class="badge bg-success">Paid</span>
+                    {% else %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow mb-4 border-warning">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> No Bed Allocated</h5>
+    </div>
+    <div class="card-body text-center">
+        <p class="mb-3">You don't have a bed allocated yet.</p>
+        <a href="{{ url_for('apply_for_bed') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Apply for a Bed
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- My Applications -->
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> My Applications</h5>
+    </div>
+    <div class="card-body">
+        {% if applications %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Application ID</th>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Applied Date</th>
+                        <th>Status</th>
+                        {% if bed_info %}
+                        <th>Bed Number</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>#{{ app.id }}</td>
+                        <td>{{ app.student_name }}</td>
+                        <td>{{ app.student_id or '-' }}</td>
+                        <td>{{ app.applied_date.strftime('%Y-%m-%d') if app.applied_date else '-' }}</td>
+                        <td>
+                            {% if app.status == 'Pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif app.status == 'Approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        {% if bed_info %}
+                        <td>
+                            {% if app.bed_no %}
+                                <span class="badge bg-primary">{{ app.bed_no }}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No applications submitted yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- User Info -->
+{% if user_info %}
+<div class="card shadow mt-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-person"></i> Account Information</h5>
+    </div>
+    <div class="card-body">
+        <p class="mb-1"><strong>Username:</strong> {{ user_info.username }}</p>
+        <p class="mb-0"><strong>Email:</strong> {{ user_info.email }}</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

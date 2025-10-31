@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}My Applications - Hostel Management{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-file-earmark-text"></i> My Applications</h2>
+
+<div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Application History</h5>
+        <a href="{{ url_for('apply_for_bed') }}" class="btn btn-light btn-sm">
+            <i class="bi bi-plus-circle"></i> New Application
+        </a>
+    </div>
+    <div class="card-body">
+        {% if applications %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Application ID</th>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Applied Date</th>
+                        <th>Status</th>
+                        <th>Bed Number</th>
+                        <th>Reviewed Date</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td><strong>#{{ app.id }}</strong></td>
+                        <td>{{ app.student_name }}</td>
+                        <td>{{ app.student_id or '-' }}</td>
+                        <td>{{ app.applied_date.strftime('%Y-%m-%d %H:%M') if app.applied_date else '-' }}</td>
+                        <td>
+                            {% if app.status == 'Pending' %}
+                                <span class="badge bg-warning">Pending Review</span>
+                            {% elif app.status == 'Approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if app.bed_no %}
+                                <span class="badge bg-primary">{{ app.bed_no }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ app.reviewed_date.strftime('%Y-%m-%d') if app.reviewed_date else '-' }}</td>
+                        <td>
+                            {% if app.notes %}
+                                <small>{{ app.notes }}</small>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> You haven't submitted any applications yet.
+            <br>
+            <a href="{{ url_for('apply_for_bed') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle"></i> Apply for a Bed
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

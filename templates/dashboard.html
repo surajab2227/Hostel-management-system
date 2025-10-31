@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Hostel Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    {% if is_admin %}
+    <div>
+        <a href="{{ url_for('view_applications') }}" class="btn btn-warning me-2">
+            <i class="bi bi-file-earmark-text"></i> 
+            Applications 
+            {% if stats.pending_applications > 0 %}
+                <span class="badge bg-dark">{{ stats.pending_applications }}</span>
+            {% endif %}
+        </a>
+        <a href="{{ url_for('add_bed') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Allot New Bed
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Pending Applications Alert -->
+{% if is_admin and stats.pending_applications > 0 %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle"></i> 
+    <strong>{{ stats.pending_applications }}</strong> pending application(s) need review.
+    <a href="{{ url_for('view_applications') }}" class="alert-link">Review now</a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-bed"></i> Total Beds</h5>
+                <h2 class="mb-0">{{ stats.total_beds or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-check-circle"></i> Available</h5>
+                <h2 class="mb-0">{{ stats.available_beds or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people"></i> Occupied</h5>
+                <h2 class="mb-0">{{ stats.reserved_beds or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-percent"></i> Occupancy</h5>
+                <h2 class="mb-0">{{ stats.occupancy_rate or 0 }}%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Status -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card border-success">
+            <div class="card-body">
+                <h5 class="card-title text-success">
+                    <i class="bi bi-check-circle-fill"></i> Paid
+                </h5>
+                <h3 class="mb-0">{{ stats.paid_count or 0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card border-danger">
+            <div class="card-body">
+                <h5 class="card-title text-danger">
+                    <i class="bi bi-clock-history"></i> Pending
+                </h5>
+                <h3 class="mb-0">{{ stats.pending_count or 0 }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Allotments -->
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Allotments</h5>
+    </div>
+    <div class="card-body">
+        {% if recent_allotments %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Bed No</th>
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Check-in Date</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for allotment in recent_allotments %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ allotment.BedNo }}</span></td>
+                        <td>{{ allotment.Name }}</td>
+                        <td>{{ allotment.StudentID or '-' }}</td>
+                        <td>{{ allotment.Contact or '-' }}</td>
+                        <td>{{ allotment.Email or '-' }}</td>
+                        <td>{{ allotment.CheckInDate.strftime('%Y-%m-%d') if allotment.CheckInDate else '-' }}</td>
+                        <td>
+                            {% if allotment.PaymentStatus == 'Paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No allotments yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

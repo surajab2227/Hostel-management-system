@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Bed Management - Hostel Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-bed"></i> Bed Management</h2>
+    {% if current_user.is_admin() %}
+    <a href="{{ url_for('add_bed') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Allot New Bed
+    </a>
+    {% endif %}
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> All Bed Allotments</h5>
+        <span class="badge bg-light text-dark">{{ allotments|length }} / {{ total_beds }} beds occupied</span>
+    </div>
+    <div class="card-body">
+        {% if allotments %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Bed No</th>
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Check-in Date</th>
+                        <th>Payment Status</th>
+                        {% if current_user.is_admin() %}
+                        <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for allotment in allotments %}
+                    <tr>
+                        <td><span class="badge bg-primary fs-6">{{ allotment.BedNo }}</span></td>
+                        <td><strong>{{ allotment.Name }}</strong></td>
+                        <td>{{ allotment.StudentID or '-' }}</td>
+                        <td>{{ allotment.Contact or '-' }}</td>
+                        <td>{{ allotment.Email or '-' }}</td>
+                        <td>{{ allotment.CheckInDate.strftime('%Y-%m-%d') if allotment.CheckInDate else '-' }}</td>
+                        <td>
+                            {% if allotment.PaymentStatus == 'Paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        {% if current_user.is_admin() %}
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <form method="POST" action="{{ url_for('update_payment', bed_no=allotment.BedNo) }}" class="d-inline">
+                                    <input type="hidden" name="status" value="{{ 'Paid' if allotment.PaymentStatus == 'Pending' else 'Pending' }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Toggle Payment">
+                                        <i class="bi bi-credit-card"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('remove_bed', bed_no=allotment.BedNo) }}" class="d-inline" 
+                                      onsubmit="return confirm('Are you sure you want to remove this allotment?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> No bed allotments found. All beds are available.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

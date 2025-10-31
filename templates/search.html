@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Search - Hostel Management{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-search"></i> Search Students</h2>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('search') }}" class="row g-3">
+            <div class="col-md-4">
+                <label for="type" class="form-label">Search By</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="name" {% if search_type == 'name' %}selected{% endif %}>Name</option>
+                    <option value="bed" {% if search_type == 'bed' %}selected{% endif %}>Bed Number</option>
+                    <option value="student_id" {% if search_type == 'student_id' %}selected{% endif %}>Student ID</option>
+                    <option value="all" {% if search_type == 'all' %}selected{% endif %}>All Fields</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="q" class="form-label">Search Query</label>
+                <input type="text" class="form-control" id="q" name="q" 
+                       value="{{ query }}" placeholder="Enter search term..." required>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if query %}
+<div class="card shadow">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-list-check"></i> Search Results 
+            <span class="badge bg-light text-dark">{{ results|length }} found</span>
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if results %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Bed No</th>
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Check-in Date</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ result.BedNo }}</span></td>
+                        <td><strong>{{ result.Name }}</strong></td>
+                        <td>{{ result.StudentID or '-' }}</td>
+                        <td>{{ result.Contact or '-' }}</td>
+                        <td>{{ result.Email or '-' }}</td>
+                        <td>{{ result.CheckInDate.strftime('%Y-%m-%d') if result.CheckInDate else '-' }}</td>
+                        <td>
+                            {% if result.PaymentStatus == 'Paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle"></i> No results found for "{{ query }}"
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

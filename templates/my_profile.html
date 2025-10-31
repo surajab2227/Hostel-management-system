@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Hostel Management{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person"></i> My Profile</h2>
+
+<div class="row">
+    <!-- Account Information -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-person-circle"></i> Account Information</h5>
+            </div>
+            <div class="card-body">
+                {% if user_info %}
+                <p class="mb-2"><strong>Username:</strong> {{ user_info.username }}</p>
+                <p class="mb-2"><strong>Email:</strong> {{ user_info.email }}</p>
+                <p class="mb-0"><strong>Account Created:</strong> 
+                    {{ user_info.created_at.strftime('%Y-%m-%d') if user_info.created_at else '-' }}
+                </p>
+                {% else %}
+                <p class="text-muted">No account information available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bed Information -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow {% if bed_info %}border-success{% else %}border-warning{% endif %}">
+            <div class="card-header {% if bed_info %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                <h5 class="mb-0">
+                    <i class="bi bi-bed"></i> Bed Information
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if bed_info %}
+                <p class="mb-2">
+                    <strong>Bed Number:</strong> 
+                    <span class="badge bg-primary fs-6">{{ bed_info.BedNo }}</span>
+                </p>
+                <p class="mb-2"><strong>Name:</strong> {{ bed_info.Name }}</p>
+                {% if bed_info.StudentID %}
+                <p class="mb-2"><strong>Student ID:</strong> {{ bed_info.StudentID }}</p>
+                {% endif %}
+                {% if bed_info.Contact %}
+                <p class="mb-2"><strong>Contact:</strong> {{ bed_info.Contact }}</p>
+                {% endif %}
+                <p class="mb-2">
+                    <strong>Payment Status:</strong>
+                    {% if bed_info.PaymentStatus == 'Paid' %}
+                        <span class="badge bg-success">Paid</span>
+                    {% else %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% endif %}
+                </p>
+                <p class="mb-0">
+                    <strong>Check-in Date:</strong> 
+                    {{ bed_info.CheckInDate.strftime('%Y-%m-%d') if bed_info.CheckInDate else 'N/A' }}
+                </p>
+                {% else %}
+                <p class="text-muted mb-3">No bed allocated yet.</p>
+                <a href="{{ url_for('apply_for_bed') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> Apply for Bed
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card shadow">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-grid gap-2 d-md-flex">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                <i class="bi bi-speedometer2"></i> Go to Dashboard
+            </a>
+            {% if not bed_info %}
+            <a href="{{ url_for('apply_for_bed') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Apply for Bed
+            </a>
+            {% endif %}
+            <a href="{{ url_for('my_applications') }}" class="btn btn-outline-info">
+                <i class="bi bi-file-earmark-text"></i> View Applications
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

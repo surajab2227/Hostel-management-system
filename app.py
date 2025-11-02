@@ -23,19 +23,20 @@ mail.init_app(app)
 
 # Database connection helper
 def get_db_connection():
-    """Create and return MySQL database connection"""
+    """Create and return MySQL database connection (Render + Clever Cloud compatible)"""
     try:
         conn = mysql.connector.connect(
-            host=app.config['MYSQL_HOST'],
-            user=app.config['MYSQL_USER'],
-            password=app.config['MYSQL_PASSWORD'],
-            database=app.config['MYSQL_DATABASE'],
-            port=app.config['MYSQL_PORT']
+            host=os.getenv('MYSQL_HOST', app.config.get('MYSQL_HOST')),
+            user=os.getenv('MYSQL_USER', app.config.get('MYSQL_USER')),
+            password=os.getenv('MYSQL_PASSWORD', app.config.get('MYSQL_PASSWORD')),
+            database=os.getenv('MYSQL_DATABASE', app.config.get('MYSQL_DATABASE')),
+            port=int(os.getenv('MYSQL_PORT', app.config.get('MYSQL_PORT', 3306)))
         )
         return conn
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
+
 
 # User model (simplified for Flask-Login)
 class User:

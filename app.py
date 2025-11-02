@@ -11,6 +11,14 @@ import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
+# --- Clever Cloud MySQL configuration (Render environment variables) ---
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_ADDON_HOST', app.config.get('MYSQL_HOST'))
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_ADDON_USER', app.config.get('MYSQL_USER'))
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_ADDON_PASSWORD', app.config.get('MYSQL_PASSWORD'))
+app.config['MYSQL_DATABASE'] = os.environ.get('MYSQL_ADDON_DB', app.config.get('MYSQL_DATABASE'))
+app.config['MYSQL_PORT'] = int(os.environ.get('MYSQL_ADDON_PORT', app.config.get('MYSQL_PORT', 3306)))
+# ------------------------------------------------------------------------
+
 
 # Initialize Flask extensions
 login_manager = LoginManager()
